@@ -1,12 +1,12 @@
-require 'action_controller/railtie'
-require 'api-pagination/hooks'
-require 'ostruct'
+require "action_controller/railtie"
+require "api-pagination/hooks"
+require "ostruct"
 
 module Rails
   def self.application
     @application ||= begin
       routes = ActionDispatch::Routing::RouteSet.new
-      OpenStruct.new(:routes => routes, :env_config => {})
+      OpenStruct.new(routes: routes, env_config: {})
     end
   end
 end
@@ -25,10 +25,10 @@ module ControllerExampleGroup
   module ClassMethods
     def setup(*methods)
       methods.each do |method|
-        if method.to_s =~ /^setup_(fixtures|controller_request_and_response)$/
+        if /^setup_(fixtures|controller_request_and_response)$/.match?(method.to_s)
           prepend_before { send method }
         else
-          before         { send method }
+          before { send method }
         end
       end
     end
@@ -40,7 +40,7 @@ module ControllerExampleGroup
 end
 
 Rails.application.routes.draw do
-  resources :numbers, :only => [:index] do
+  resources :numbers, only: [:index] do
     collection do
       get :index_with_custom_render
       get :index_with_no_per_page
@@ -55,7 +55,7 @@ class NumbersSerializer
   end
 
   def to_json(options = {})
-    { numbers: @numbers.map { |n| { number: n } } }.to_json
+    {numbers: @numbers.map { |n| {number: n} }}.to_json
   end
 end
 
@@ -68,22 +68,22 @@ class NumbersController < ActionController::API
     if params[:with_headers]
       query = request.query_parameters.dup
       query.delete(:with_headers)
-      headers['Link'] = %(<#{numbers_url}?#{query.to_param}>; rel="without")
+      headers["Link"] = %(<#{numbers_url}?#{query.to_param}>; rel="without")
     end
 
-    paginate :json => (1..total).to_a, :per_page => 10
+    paginate json: (1..total).to_a, per_page: 10
   end
 
   def index_with_custom_render
-    total   = params.fetch(:count).to_i
+    total = params.fetch(:count).to_i
     numbers = (1..total).to_a
-    numbers = paginate numbers, :per_page => 10
+    numbers = paginate numbers, per_page: 10
 
     render json: NumbersSerializer.new(numbers)
   end
 
   def index_with_no_per_page
-    total   = params.fetch(:count).to_i
+    total = params.fetch(:count).to_i
     numbers = (1..total).to_a
     numbers = paginate numbers
 

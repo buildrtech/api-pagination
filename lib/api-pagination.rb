@@ -1,11 +1,11 @@
-require 'api-pagination/configuration'
-require 'api-pagination/version'
+require "api-pagination/configuration"
+require "api-pagination/version"
 
 module ApiPagination
   class << self
     def paginate(collection, options = {})
-      options[:page]     = options[:page].to_i
-      options[:page]     = 1 if options[:page] <= 0
+      options[:page] = options[:page].to_i
+      options[:page] = 1 if options[:page] <= 0
       options[:per_page] = options[:per_page].to_i
 
       case ApiPagination.config.paginator
@@ -26,10 +26,10 @@ module ApiPagination
       {}.tap do |pages|
         unless collection.first_page?
           pages[:first] = 1
-          pages[:prev]  = collection.current_page - 1
+          pages[:prev] = collection.current_page - 1
         end
 
-        unless collection.last_page? || (ApiPagination.config.paginator == :kaminari && collection.out_of_range?)
+        if !(collection.last_page? || (ApiPagination.config.paginator == :kaminari && collection.out_of_range?))
           pages[:last] = collection.total_pages if ApiPagination.config.include_total
           pages[:next] = collection.current_page + 1
         end
@@ -38,9 +38,9 @@ module ApiPagination
 
     def total_from(collection)
       case ApiPagination.config.paginator
-        when :pagy          then collection.count.to_s
-        when :kaminari      then collection.total_count.to_s
-        when :will_paginate then collection.total_entries.to_s
+      when :pagy then collection.count.to_s
+      when :kaminari then collection.total_count.to_s
+      when :will_paginate then collection.total_entries.to_s
       end
     end
 
@@ -60,14 +60,14 @@ module ApiPagination
         collection[pagy.offset, pagy.limit]
       end
 
-      return [collection, pagy]
+      [collection, pagy]
     end
 
     def pagy_from(collection, options)
-      if options[:count]
-        count = options[:count]
+      count = if options[:count]
+        options[:count]
       else
-        count = collection.is_a?(Array) ? collection.count : collection.count(:all)
+        collection.is_a?(Array) ? collection.count : collection.count(:all)
       end
 
       # Pagy 9.x requires keyword arguments
@@ -80,7 +80,7 @@ module ApiPagination
       {}.tap do |pages|
         unless pagy.page == 1
           pages[:first] = 1
-          pages[:prev]  = pagy.prev
+          pages[:prev] = pagy.prev
         end
 
         unless pagy.page == pagy.pages
@@ -108,11 +108,11 @@ module ApiPagination
         options[:per_page] = default_per_page_for_will_paginate(collection)
       end
 
-      collection = if defined?(Sequel::Dataset) && collection.kind_of?(Sequel::Dataset)
+      collection = if defined?(Sequel::Dataset) && collection.is_a?(Sequel::Dataset)
         collection.paginate(options[:page], options[:per_page])
       else
         supported_options = [:page, :per_page, :total_entries]
-        options = options.dup.keep_if { |k,v| supported_options.include?(k.to_sym) }
+        options = options.dup.keep_if { |k, v| supported_options.include?(k.to_sym) }
         collection.paginate(options)
       end
 
@@ -142,4 +142,4 @@ module ApiPagination
   end
 end
 
-require 'api-pagination/hooks'
+require "api-pagination/hooks"

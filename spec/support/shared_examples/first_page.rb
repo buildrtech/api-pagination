@@ -1,4 +1,4 @@
-shared_examples 'an endpoint with a first page' do
+shared_examples "an endpoint with a first page" do
   it 'should not give a link with rel "first"' do
     expect(link).not_to include('rel="first"')
   end
@@ -15,12 +15,12 @@ shared_examples 'an endpoint with a first page' do
     expect(links).to include('<http://example.org/numbers?count=100&page=2>; rel="next"')
   end
 
-  it 'should give a Total header' do
+  it "should give a Total header" do
     expect(total).to eq(100)
   end
 
-  it 'should list the first page of numbers in the response body' do
-    body = '[1,2,3,4,5,6,7,8,9,10]'
+  it "should list the first page of numbers in the response body" do
+    body = "[1,2,3,4,5,6,7,8,9,10]"
     if defined?(response)
       expect(response.body).to eq(body)
     else

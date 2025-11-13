@@ -1,10 +1,10 @@
-require 'rails/railtie'
+require "rails/railtie"
 
 module ApiPagination
   class Railtie < ::Rails::Railtie
     initializer :api_pagination do
       ActiveSupport.on_load(:action_controller) do
-        require 'rails/pagination'
+        require "rails/pagination"
 
         klass = if Rails::VERSION::MAJOR >= 5 || defined?(ActionController::API)
           ActionController::API

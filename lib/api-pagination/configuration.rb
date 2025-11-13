@@ -17,15 +17,15 @@ module ApiPagination
     end
 
     def initialize
-      @total_header    = 'Total'
-      @per_page_header = 'Per-Page'
-      @page_header     = nil
-      @include_total   = true
-      @base_url   = nil
+      @total_header = "Total"
+      @per_page_header = "Per-Page"
+      @page_header = nil
+      @include_total = true
+      @base_url = nil
       @response_formats = [:json, :xml]
     end
 
-    ['page', 'per_page'].each do |param_name|
+    ["page", "per_page"].each do |param_name|
       method_name = "#{param_name}_param"
       instance_variable_name = "@#{method_name}"
 
@@ -37,7 +37,7 @@ module ApiPagination
 
         if instance_variable_get(instance_variable_name).nil?
           # use :page & :per_page by default
-          instance_variable_set(instance_variable_name, (lambda { |p| p[param_name.to_sym] }))
+          instance_variable_set(instance_variable_name, lambda { |p| p[param_name.to_sym] })
         end
 
         instance_variable_get(instance_variable_name).call(params)
@@ -45,7 +45,7 @@ module ApiPagination
 
       define_method "#{method_name}=" do |param|
         if param.is_a?(Symbol) || param.is_a?(String)
-          instance_variable_set(instance_variable_name, (lambda { |params| params[param] }))
+          instance_variable_set(instance_variable_name, lambda { |params| params[param] })
         else
           raise ArgumentError, "Cannot set page_param option"
         end
@@ -78,24 +78,24 @@ module ApiPagination
     def set_paginator
       conditions = [defined?(Pagy), defined?(Kaminari), defined?(WillPaginate::CollectionMethods)]
       if conditions.compact.size > 1
-        Kernel.warn <<-WARNING
-Warning: api-pagination relies on Pagy, Kaminari, or WillPaginate, but more than
-one are currently active. If possible, you should remove one or the other. If
-you can't, you _must_ configure api-pagination on your own. For example:
-
-ApiPagination.configure do |config|
-  config.paginator = :kaminari
-end
-
-You should also configure Kaminari to use a different `per_page` method name as
-using these gems together causes a conflict; some information can be found at
-https://github.com/activeadmin/activeadmin/wiki/How-to-work-with-will_paginate
-
-Kaminari.configure do |config|
-  config.page_method_name = :per_page_kaminari
-end
-
-WARNING
+        Kernel.warn <<~WARNING
+          Warning: api-pagination relies on Pagy, Kaminari, or WillPaginate, but more than
+          one are currently active. If possible, you should remove one or the other. If
+          you can't, you _must_ configure api-pagination on your own. For example:
+          
+          ApiPagination.configure do |config|
+            config.paginator = :kaminari
+          end
+          
+          You should also configure Kaminari to use a different `per_page` method name as
+          using these gems together causes a conflict; some information can be found at
+          https://github.com/activeadmin/activeadmin/wiki/How-to-work-with-will_paginate
+          
+          Kaminari.configure do |config|
+            config.page_method_name = :per_page_kaminari
+          end
+          
+        WARNING
       elsif defined?(Pagy)
         use_pagy
       elsif defined?(Kaminari)
@@ -110,14 +110,19 @@ WARNING
     end
 
     def use_kaminari
-      require 'kaminari/models/array_extension'
+      require "kaminari/models/array_extension"
       @paginator = :kaminari
     end
 
     def use_will_paginate
       WillPaginate::CollectionMethods.module_eval do
-        def first_page?() !previous_page end
-        def last_page?() !next_page end
+        def first_page?
+          !previous_page
+        end
+
+        def last_page?
+          !next_page
+        end
       end
 
       @paginator = :will_paginate
@@ -132,6 +137,6 @@ WARNING
     def config
       @config ||= Configuration.new
     end
-    alias :configuration :config
+    alias_method :configuration, :config
   end
 end

@@ -5,7 +5,7 @@ module ApiPagination
     PATCH = 0
 
     def self.to_s
-      [MAJOR, MINOR, PATCH].join('.')
+      [MAJOR, MINOR, PATCH].join(".")
     end
   end
 

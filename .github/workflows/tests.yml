@@ -1,4 +1,4 @@
-name: CI
+name: Tests
 
 on:
   push:
@@ -17,7 +17,8 @@ jobs:
     env:
       PAGINATOR: ${{ matrix.paginator }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
